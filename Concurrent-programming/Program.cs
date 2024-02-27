@@ -1,7 +1,10 @@
-﻿internal class Program
+﻿namespace HelloWorld
 {
-    private static void Main(string[] args)
+    public class Program
     {
-        Console.WriteLine("Hello, World!");
+        public static void Main()
+        {
+            Console.WriteLine("Hello World!");
+        }
     }
 }
