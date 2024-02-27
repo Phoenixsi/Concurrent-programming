@@ -1,5 +1,4 @@
-## Create a repository checklist
-# Etap 0
+## Etap 0
 - [ ] the task provides required feedback and has been submitted (needs grading)
 - [X] the ability to clone the repository to the teacher's computer
 - [X] there is README.md formatted as expected
@@ -7,7 +6,7 @@
 - [X] build succeeded
 - [X] all UTs are green
 
-# Etap 1
+## Etap 1
 - [ ] text is in C#
 - [ ] build succeeded
 - [ ] all UT are green
