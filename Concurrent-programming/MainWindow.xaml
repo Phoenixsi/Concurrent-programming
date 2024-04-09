@@ -5,9 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Concurrent_programming"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="1200">
+        Title="MainWindow" Height="600" Width="900"
+        ResizeMode="NoResize">
     <Grid>
+        <Button x:Name="Start" Content="Start" HorizontalAlignment="Left" Margin="17,10,0,0" Width="100px" VerticalAlignment="Top"/>
+        <Button x:Name="Stop" Content="Stop" HorizontalAlignment="Left" Margin="160,10,0,0" Width="100px" VerticalAlignment="Top"/>
 
+        <Label Margin="361,4,361,448">Ile kulek?</Label>
+        <Slider x:Name="countValue" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Width="180" Margin="305,30,295,438"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <TextBlock Text="{Binding ElementName=countValue, Path=Value, StringFormat='Wartość: {0:F0}'}" Margin="369,51,369,408"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Label Margin="540,6,136,448"  HorizontalAlignment="Left" VerticalAlignment="Top">Podaj wielkość kulek:</Label>
+        <TextBox x:Name="sizeValue" Width="160" Margin="540,36,141,431"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Border BorderBrush="Black" BorderThickness="1" Margin="17,94,10,10">
+            <ItemsControl x:Name="ballsControl" Margin="17,94,10,10">
+                
+            </ItemsControl>
+        </Border>
     </Grid>
-
 </Window>
