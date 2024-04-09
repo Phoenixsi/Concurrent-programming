@@ -15,4 +15,8 @@
     <Folder Include="Prezentation\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Page Include="App.xaml" />
+  </ItemGroup>
+
 </Project>

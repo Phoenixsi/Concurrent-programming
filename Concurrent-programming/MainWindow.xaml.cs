@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Concurrent_programming
+namespace Prezentation
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

@@ -1,9 +1,9 @@
-﻿<Window x:Class="Concurrent_programming.MainWindow"
+﻿<Window x:Class="Prezentation.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Concurrent_programming"
+        xmlns:local="clr-namespace:Prezentation"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="900"
         ResizeMode="NoResize">
@@ -17,7 +17,7 @@
         <Label Margin="540,6,136,448"  HorizontalAlignment="Left" VerticalAlignment="Top">Podaj wielkość kulek:</Label>
         <TextBox x:Name="sizeValue" Width="160" Margin="540,36,141,431"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <Border BorderBrush="Black" BorderThickness="1" Margin="17,94,10,10">
-            <ItemsControl x:Name="ballsControl" Margin="17,94,10,10">
+            <ItemsControl x:Name="ballsControl">
                 
             </ItemsControl>
         </Border>
