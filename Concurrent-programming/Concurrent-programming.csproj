@@ -9,4 +9,10 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Logic\" />
+    <Folder Include="Prezentation\" />
+  </ItemGroup>
+
 </Project>
