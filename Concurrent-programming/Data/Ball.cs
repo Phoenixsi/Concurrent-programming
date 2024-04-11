@@ -11,13 +11,13 @@ namespace Data
 {
     public class Ball : AbstractBall
     {
-        private readonly int ballID = 0;
+        private readonly int ballID;
         private Vector2 ballPosition;
         private Vector2 ballVelocity;
         private double ballSize;
         private double ballMass;
 
-        public Ball(int ballID, Vector2 ballPosition = new Vector2(), Vector2 ballVelocity = new Vector2(), double ballSize = 0.0, double ballMass = 10.0)
+        public Ball(int ballID, Vector2 ballPosition = new Vector2(), Vector2 ballVelocity = new Vector2(), double ballSize = 10.0, double ballMass = 10.0)
         {
             this.ballID = ballID;
             this.ballPosition = ballPosition;
