@@ -10,11 +10,11 @@ namespace Data
 {
     public abstract class AbstractBall : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public abstract event PropertyChangedEventHandler? PropertyChanged;
 
         public abstract int BallID { get; }
-        public abstract Vector<double> BallPosition { get; set; }
-        public abstract Vector<double> BallVelocity { get; set; }
+        public abstract Vector2 BallPosition { get; set; }
+        public abstract Vector2 BallVelocity { get; set; }
         public abstract double BallSize { get; set; }
         public abstract double BallMass { get; set; }
 

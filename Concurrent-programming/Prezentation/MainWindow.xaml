@@ -12,7 +12,7 @@
         <Button x:Name="Stop" Content="Stop" HorizontalAlignment="Left" Margin="160,10,0,0" Width="100px" VerticalAlignment="Top"/>
 
         <Label Margin="361,4,361,448">Ile kulek?</Label>
-        <Slider x:Name="countValue" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Width="180" Margin="305,30,295,438"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Slider x:Name="countValue" Value="{Binding numberOfBalls, Mode=TwoWay}" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Width="180" Margin="305,30,295,438"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <TextBlock Text="{Binding ElementName=countValue, Path=Value, StringFormat='Wartość: {0:F0}'}" Margin="369,51,369,408"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <Label Margin="540,6,136,448"  HorizontalAlignment="Left" VerticalAlignment="Top">Podaj wielkość kulek:</Label>
         <TextBox x:Name="sizeValue" Width="160" Margin="540,36,141,431"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
