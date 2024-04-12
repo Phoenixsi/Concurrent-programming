@@ -15,7 +15,7 @@ namespace Data
         public abstract int BallID { get; }
         public abstract Vector2 BallPosition { get; set; }
         public abstract Vector2 BallVelocity { get; set; }
-        public abstract double BallSize { get; set; }
+        public abstract double BallRadius { get; set; }
         public abstract double BallMass { get; set; }
 
     }

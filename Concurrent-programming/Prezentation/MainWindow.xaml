@@ -8,17 +8,44 @@
         Title="MainWindow" Height="600" Width="900"
         ResizeMode="NoResize">
     <Grid>
-        <Button x:Name="Start" Content="Start" HorizontalAlignment="Left" Margin="17,10,0,0" Width="100px" VerticalAlignment="Top"/>
+        <!-- Przyciski Rozpoczynające i Stopujące daną symulacje -->
+        <Button x:Name="Start" Content="Start" HorizontalAlignment="Left" Margin="17,10,0,0" Width="100px" VerticalAlignment="Top" />
         <Button x:Name="Stop" Content="Stop" HorizontalAlignment="Left" Margin="160,10,0,0" Width="100px" VerticalAlignment="Top"/>
 
+        <!-- Tutaj zarządzanie ilością kulek -->
         <Label Margin="361,4,361,448">Ile kulek?</Label>
+            <!-- Value jest to ilość wybranych piłek przez użytkownika -->
         <Slider x:Name="countValue" Value="{Binding numberOfBalls, Mode=TwoWay}" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Width="180" Margin="305,30,295,438"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <TextBlock Text="{Binding ElementName=countValue, Path=Value, StringFormat='Wartość: {0:F0}'}" Margin="369,51,369,408"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+       
+        <!-- Zarządzanie wielkością kul podajemy promień -->
         <Label Margin="540,6,136,448"  HorizontalAlignment="Left" VerticalAlignment="Top">Podaj wielkość kulek:</Label>
-        <TextBox x:Name="sizeValue" Width="160" Margin="540,36,141,431"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <!-- Po przez binding z Text przekazujemy wartości promienia -->
+        <TextBox x:Name="sizeValue" Width="160" Margin="540,36,141,431"  HorizontalAlignment="Left" VerticalAlignment="Top" Text ="{Binding ta, UpdateSourceTrigger=PropertyChanged}"/>
+        
+        <!-- Plansza na której poruszać się będą kule -->
         <Border BorderBrush="Black" BorderThickness="1" Margin="17,94,10,10">
-            <ItemsControl x:Name="ballsControl">
-                
+            <ItemsControl x:Name="BallsControlOnCanva" ItemsSource="{Binding BallsCollection.Balls, UpdateSourceTrigger=PropertyChanged}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas x:Name="BallOnCanvas" HorizontalAlignment="Center" Width="{Binding CanvasWidth, Mode=TwoWay}" Height="{Binding CanvasHeight, Mode=TwoWay}"  VerticalAlignment="Top" Background="#FF71"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="{x:Type ContentPresenter}">
+                        <Setter Property="Canvas.Left" Value="{Binding BallPosition.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Setter Property="Canvas.Top" Value="{Binding BallPosition.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse Width="{Binding Size}" Height="{Binding Size}" Fill="{Binding Color}">
+                            <Ellipse.RenderTransform>
+                                <TranslateTransform X="{Binding BallPosition.X}" Y="{Binding BallPosition.Y}"/>
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Border>
     </Grid>

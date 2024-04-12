@@ -1,27 +1,27 @@
-﻿using System;
+﻿using Data;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Concurrent_programming.Logic
+namespace Logic
 {
-    public abstract class AbstractBallsColletors : INotifyCollectionChanged, IDisposable
+    public abstract class AbstractBallsCollection : INotifyCollectionChanged, IDisposable
     {
-        public abstract int Count { get; }
+        public abstract ObservableCollection<AbstractBall> Balls { get; set; }
+        public abstract int CountedBalls { get; }
         public abstract void AddBall();
-        public abstract void RemoveBall();
-        public abstract void ClearBall();
+        public abstract void RemoveBall(int index);
+        public abstract void InitBalls(int ballsNumber);
         public abstract void Dispose();
         public abstract void StartTimer();
         public abstract void StopTimer();
-        public abstract void InitBalls(int ballsNumber);
-        public abstract void SetNewArea(double width, double height);
-        public abstract void SetNewSize(double size);
 
 
-        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+        public abstract event NotifyCollectionChangedEventHandler? CollectionChanged;
 
        
     }

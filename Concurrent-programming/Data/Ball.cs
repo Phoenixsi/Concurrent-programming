@@ -14,15 +14,15 @@ namespace Data
         private readonly int ballID;
         private Vector2 ballPosition;
         private Vector2 ballVelocity;
-        private double ballSize;
+        private double ballRadius;
         private double ballMass;
 
-        public Ball(int ballID, Vector2 ballPosition = new Vector2(), Vector2 ballVelocity = new Vector2(), double ballSize = 10.0, double ballMass = 10.0)
+        public Ball(int ballID, Vector2 ballPosition = new Vector2(), Vector2 ballVelocity = new Vector2(), double ballRadius = 10.0, double ballMass = 10.0)
         {
             this.ballID = ballID;
             this.ballPosition = ballPosition;
             this.ballVelocity = ballVelocity;
-            this.ballSize = ballSize;
+            this.ballRadius = ballRadius;
             this.ballMass = ballMass;
         }
 
@@ -48,10 +48,10 @@ namespace Data
             }
         }
 
-        public override double BallSize
+        public override double BallRadius
         {
-            get => ballSize;
-            set => ballSize = value;
+            get => ballRadius;
+            set => ballRadius = value;
         }
 
         public override double BallMass
