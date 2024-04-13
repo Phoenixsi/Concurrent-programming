@@ -40,50 +40,59 @@ namespace Logic
         {
             foreach (Ball ball in Balls)
             {
-                double newcordX = ball.BallPositionX + ball.BallVelocity.X;
-                double newcordY = ball.BallPositionY + ball.BallVelocity.Y;
-                double newvelX = ball.BallVelocity.X;
-                double newvelY = ball.BallVelocity.Y;
+                double newBallPositionX = ball.BallPositionX + ball.BallVelocity.X;
+                double newBallPositonY = ball.BallPositionY + ball.BallVelocity.Y;
 
-                if (newcordX > canvasWidth - ball.BallRadius)
+                double newBallVelocityX = ball.BallVelocity.X;
+                double newBallVelocityY = ball.BallVelocity.Y;
+
+                // Góra
+                if (newBallPositionX < 0)
                 {
-                    newvelX = -newvelX;
-                    newcordX += newvelX;
-                }
-                if (newcordX < 0)
-                {
-                    newvelX = -newvelX;
-                    newcordX += newvelX;
-                }
-                if (newcordY > canvasHeight - ball.BallRadius)
-                {
-                    newcordY = canvasHeight - ball.BallRadius;
-                    newvelY = -newvelY;
-                }
-                if (newcordY < 0)
-                {
-                    newcordY = 0;
-                    newvelY = -newvelY;
+                    newBallVelocityX = -newBallVelocityX;
+                    newBallPositionX += newBallVelocityX;
                 }
 
-                if (ball.BallPositionX != newcordX)
+                //Lewa
+                if (newBallPositonY < 0)
                 {
-                    ball.BallPositionX = newcordX;
+                    newBallPositonY = 0;
+                    newBallVelocityY = -newBallVelocityY;
                 }
 
-                if (ball.BallPositionY != newcordY)
+                //Praa
+                if (newBallPositionX > canvasWidth - ball.BallRadius)
                 {
-                    ball.BallPositionY = newcordY;
+                    newBallPositionX = canvasWidth - ball.BallRadius;
+                    newBallVelocityX = -newBallVelocityX;
                 }
 
-                if (ball.BallVelocity.X != newvelX)
+                //Dół
+                if (newBallPositonY > canvasHeight - ball.BallRadius )
                 {
-                    ball.BallVelocity = new Vector2((float)newvelX, ball.BallVelocity.Y);
+                    newBallPositonY = canvasHeight - ball.BallRadius;
+                    newBallVelocityY = -newBallVelocityY;
                 }
 
-                if (ball.BallVelocity.Y != newvelY)
+
+                if (ball.BallPositionX != newBallPositionX)
                 {
-                    ball.BallVelocity = new Vector2(ball.BallVelocity.X, (float)newvelY);
+                    ball.BallPositionX = newBallPositionX;
+                }
+
+                if (ball.BallPositionY != newBallPositonY)
+                {
+                    ball.BallPositionY = newBallPositonY;
+                }
+
+                if (ball.BallVelocity.X != newBallVelocityX)
+                {
+                    ball.BallVelocity = new Vector2((float)newBallVelocityX, ball.BallVelocity.Y);
+                }
+
+                if (ball.BallVelocity.Y != newBallVelocityY)
+                {
+                    ball.BallVelocity = new Vector2(ball.BallVelocity.X, (float)newBallVelocityY);
                 }
 
                 // Log the new position and velocity of the ball

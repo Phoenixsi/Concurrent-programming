@@ -5,27 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Prezentation"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="900"
+        Title="MainWindow" Height="660" Width="1058"
         ResizeMode="NoResize">
     <Grid>
         <!-- Przyciski Rozpoczynające i Stopujące daną symulacje -->
-        <Button x:Name="Start" Content="Start" HorizontalAlignment="Left" Margin="17,10,0,0" Width="100px" VerticalAlignment="Top" Command="{Binding Start}" CommandParameter="{Binding NumberOfBalls, UpdateSourceTrigger=PropertyChanged}" />
-        <Button x:Name="Stop" Content="Stop" HorizontalAlignment="Left" Margin="160,10,0,0" Width="100px" VerticalAlignment="Top" Command="{Binding Stop}"/>
+        <Button x:Name="Start" Content="Start" HorizontalAlignment="Left" Margin="180,20,0,0" Width="100px" VerticalAlignment="Top" Command="{Binding Start}" CommandParameter="{Binding NumberOfBalls, UpdateSourceTrigger=PropertyChanged}" />
+        <Button x:Name="Stop" Content="Stop" HorizontalAlignment="Left" Margin="324,20,0,0" Width="100px" VerticalAlignment="Top" Command="{Binding Stop}"/>
 
         <!-- Tutaj zarządzanie ilością kulek -->
-        <Label Margin="361,4,361,448">Ile kulek?</Label>
+        <Label Margin="532,16,190,436">Ile kulek?</Label>
         <!-- Value jest to ilość wybranych piłek przez użytkownika -->
-        <Slider x:Name="countValue" Value="{Binding NumberOfBalls, Mode=TwoWay}" Minimum="0" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Width="180" Margin="305,30,295,438"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
-        <TextBlock Text="{Binding ElementName=countValue, Path=Value, StringFormat='Wartość: {0:F0}'}" Margin="369,51,369,408"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Slider x:Name="countValue" Value="{Binding NumberOfBalls, Mode=TwoWay}" Minimum="0" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Width="180" Margin="468,40,0,0"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <TextBlock Text="{Binding ElementName=countValue, Path=Value, StringFormat='Wartość: {0:F0}'}" Margin="532,62,0,0"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
         <!-- Zarządzanie wielkością kul podajemy promień -->
-        <Label Margin="540,6,136,448"  HorizontalAlignment="Left" VerticalAlignment="Top">Podaj wielkość kulek:</Label>
+        <Label Margin="704,16,0,0"  HorizontalAlignment="Left" VerticalAlignment="Top">Podaj wielkość kulek:</Label>
         <!-- Po przez binding z Text przekazujemy wartości promienia -->
-        <TextBox x:Name="sizeValue" Width="160" Margin="540,36,141,431"  HorizontalAlignment="Left" VerticalAlignment="Top" Text ="{Binding Radius, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox x:Name="sizeValue" Width="160" Margin="704,46,0,0"  HorizontalAlignment="Left" VerticalAlignment="Top" Text ="{Binding Radius, UpdateSourceTrigger=PropertyChanged}"/>
 
         <!-- Plansza na której poruszać się będą kule -->
-        <Border BorderBrush="Black" BorderThickness="1" Margin="17,94,10,10">
-            <ItemsControl x:Name="BallsControlOnCanva" ItemsSource="{Binding BallsCollection.Balls, UpdateSourceTrigger=PropertyChanged}">
+        <Border BorderBrush="Black" BorderThickness="1" Margin="17,94,10,10" Width="873" Height="480">
+            <ItemsControl x:Name="BallsControlOnCanva" ItemsSource="{Binding BallsCollection.Balls, UpdateSourceTrigger=PropertyChanged}" Width="871" Height="478">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas x:Name="BallOnCanvas" Width="{Binding CanvasWidth, Mode=OneWayToSource}" Height="{Binding CanvasHeight, Mode=OneWayToSource}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Aqua"/>
@@ -38,11 +38,11 @@
                     </Style>
                 </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate>  
+                    <DataTemplate>
                         <Ellipse Width="{Binding BallRadius}" Height="{Binding BallRadius}" Fill="Red" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </Border>   
+        </Border>
     </Grid>
 </Window>

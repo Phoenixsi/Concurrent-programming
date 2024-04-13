@@ -28,7 +28,7 @@ namespace Prezentation
         public View()
         {
 
-            BallsCollection = new BallsCollection(871, 478.04);
+            BallsCollection = new BallsCollection(871.00, 478.00);
 
             Start = new Start(this);
             Stop = new Stop(this);
@@ -126,17 +126,6 @@ namespace Prezentation
                     canvasHeight = value;
                     OnPropertyChanged("CanvasHeight");
                 }
-            }
-        }
-
-        private void Canvas_Loaded(object sender, RoutedEventArgs e)
-        {
-            Canvas canvas = sender as Canvas;
-            if (canvas != null)
-            {
-                CanvasWidth = canvas.ActualWidth;
-                CanvasHeight = canvas.ActualHeight;
-                BallsCollection = new BallsCollection(CanvasWidth, CanvasHeight);
             }
         }
 
