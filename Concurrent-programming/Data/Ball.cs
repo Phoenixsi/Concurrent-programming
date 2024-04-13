@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Data
 {
@@ -16,6 +17,7 @@ namespace Data
         private Vector2 ballVelocity;
         private double ballRadius;
         private double ballMass;
+        public Brush Color { get; set; }
 
         public Ball(int ballID, Vector2 ballPosition = new Vector2(), Vector2 ballVelocity = new Vector2(), double ballRadius = 10.0, double ballMass = 10.0)
         {
@@ -37,6 +39,27 @@ namespace Data
                 OnPropertyChanged("BallPosition");
             }
         }
+
+        public override float BallPositionX
+        {
+            get => BallPosition.X;
+            set
+            {
+                BallPosition = new Vector2(value, BallPosition.Y);
+                OnPropertyChanged("BallPosition.X");
+            }
+        }
+
+        public override float BallPositionY
+        {
+            get => BallPosition.Y;
+            set
+            {
+                BallPosition = new Vector2(BallPosition.X, value);
+                OnPropertyChanged("BallPosition.Y");
+            }
+        }
+
 
         public override Vector2 BallVelocity
         {

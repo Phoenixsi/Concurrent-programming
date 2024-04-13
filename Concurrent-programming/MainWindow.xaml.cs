@@ -19,6 +19,8 @@ namespace Prezentation
         public MainWindow()
         {
             InitializeComponent();
+            View view = new();
+            DataContext = view;
         }
     }
 }

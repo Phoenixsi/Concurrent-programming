@@ -11,9 +11,9 @@ namespace Logic
     {
         public override ObservableCollection<AbstractBall> Balls { get; set; }
 
-        readonly System.Timers.Timer? timer;
-        double CanvaWidth = 0;
-        double CanvaHeight = 0;
+        readonly System.Timers.Timer timer;
+        double CanvaWidth = 500;
+        double CanvaHeight = 500;
         double DefRad = 50;
 
         public BallsCollection(double CanvaWidth = 0.0, double CanvaHeight = 0.0)
@@ -93,12 +93,17 @@ namespace Logic
 
         public override void StartTimer()
         {
-            timer?.Start();
+            timer.Start();
         }
 
         public override void StopTimer()
         {
             timer?.Stop();
+        }
+
+        public override void ChangeRadius(double radius)
+        {
+            DefRad = radius;
         }
 
         public override event NotifyCollectionChangedEventHandler? CollectionChanged;

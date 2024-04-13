@@ -15,6 +15,7 @@ namespace Logic
         public abstract int CountedBalls { get; }
         public abstract void AddBall();
         public abstract void RemoveBall(int index);
+        public abstract void ChangeRadius(double radius);
         public abstract void InitBalls(int ballsNumber);
         public abstract void Dispose();
         public abstract void StartTimer();
