@@ -23,7 +23,7 @@ namespace Logic
             this.canvasWidth = CanvasWidth;
             this.canvasHeight = CanvasHeight;
 
-            timer = new Timer(10);
+            timer = new Timer(20);
                 
             timer.Elapsed += EveryFrame;
             timer.AutoReset = true;
@@ -40,8 +40,8 @@ namespace Logic
         {
             foreach (Ball ball in Balls)
             {
-                double newcordX = ball.BallPosition.X + ball.BallVelocity.X;
-                double newcordY = ball.BallPosition.Y + ball.BallVelocity.Y;
+                double newcordX = ball.BallPositionX + ball.BallVelocity.X;
+                double newcordY = ball.BallPositionY + ball.BallVelocity.Y;
                 double newvelX = ball.BallVelocity.X;
                 double newvelY = ball.BallVelocity.Y;
 
@@ -66,14 +66,14 @@ namespace Logic
                     newvelY = -newvelY;
                 }
 
-                if (ball.BallPosition.X != newcordX)
+                if (ball.BallPositionX != newcordX)
                 {
-                    ball.BallPosition = new Vector2((float)newcordX, ball.BallPosition.Y);
+                    ball.BallPositionX = newcordX;
                 }
 
-                if (ball.BallPosition.Y != newcordY)
+                if (ball.BallPositionY != newcordY)
                 {
-                    ball.BallPosition = new Vector2(ball.BallPosition.X, (float)newcordY);
+                    ball.BallPositionY = newcordY;
                 }
 
                 if (ball.BallVelocity.X != newvelX)
@@ -109,8 +109,8 @@ namespace Logic
             }
             while (isOverlapping);
 
-            double randomVX = -100 + random.NextDouble() * 100;
-            double randomVY = -100 + random.NextDouble() * 100;
+            double randomVX = -10 + random.NextDouble() * 10;
+            double randomVY = -10 + random.NextDouble() * 10;
             Vector2 randomVelocity = new Vector2((float)randomVX, (float)randomVY);
 
             AbstractBall ball = new Ball(Balls.Count + 1, randomPosition, randomVelocity, DefRad); // Można dodać masę by niektóre były większe 

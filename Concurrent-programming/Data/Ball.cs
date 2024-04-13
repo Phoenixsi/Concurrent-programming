@@ -36,7 +36,6 @@ namespace Data
             set
             {
                 ballPosition = value;
-                OnPropertyChanged("BallPosition");
             }
         }
 
