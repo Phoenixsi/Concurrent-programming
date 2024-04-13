@@ -45,7 +45,7 @@ namespace Logic
                 double newvelX = ball.BallVelocity.X;
                 double newvelY = ball.BallVelocity.Y;
 
-                if (newcordX > canvasHeight - ball.BallRadius)
+                if (newcordX > canvasWidth - ball.BallRadius)
                 {
                     newvelX = -newvelX;
                     newcordX += newvelX;
@@ -90,6 +90,7 @@ namespace Logic
                 Debug.WriteLine($"Ball ID: {ball.BallID}, New Position: {ball.BallPosition}, New Velocity: {ball.BallVelocity}");
             }
         }
+
 
 
 
