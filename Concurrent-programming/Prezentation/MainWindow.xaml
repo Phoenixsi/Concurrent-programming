@@ -15,7 +15,7 @@
         <!-- Tutaj zarządzanie ilością kulek -->
         <Label Margin="361,4,361,448">Ile kulek?</Label>
         <!-- Value jest to ilość wybranych piłek przez użytkownika -->
-        <Slider x:Name="countValue" Value="{Binding NumberOfBalls, Mode=TwoWay}" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Width="180" Margin="305,30,295,438"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Slider x:Name="countValue" Value="{Binding NumberOfBalls, Mode=TwoWay}" Minimum="0" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Width="180" Margin="305,30,295,438"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <TextBlock Text="{Binding ElementName=countValue, Path=Value, StringFormat='Wartość: {0:F0}'}" Margin="369,51,369,408"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
         <!-- Zarządzanie wielkością kul podajemy promień -->
@@ -28,7 +28,7 @@
             <ItemsControl x:Name="BallsControlOnCanva" ItemsSource="{Binding BallsCollection.Balls, UpdateSourceTrigger=PropertyChanged}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas x:Name="BallOnCanvas" HorizontalAlignment="Center" Width="{Binding CanvasWidth, Mode=TwoWay}" Height="{Binding CanvasHeight, Mode=TwoWay}"  VerticalAlignment="Top" Background="#FF71"/>
+                        <Canvas x:Name="BallOnCanvas" Width="{Binding CanvasWidth, Mode=OneWayToSource}" Height="{Binding CanvasHeight, Mode=OneWayToSource}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Aqua"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemContainerStyle>
@@ -38,8 +38,8 @@
                     </Style>
                 </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Ellipse Width="{Binding BallRadius}" Height="{Binding BallRadius}" Fill="{Binding Color}" />
+                    <DataTemplate>  
+                        <Ellipse Width="{Binding BallRadius}" Height="{Binding BallRadius}" Fill="Red" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

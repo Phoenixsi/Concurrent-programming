@@ -22,10 +22,11 @@ namespace Prezentation
         {
             if (parameter != null)
             {
-                return (int)parameter > 0;
+                return int.TryParse(parameter.ToString(), out int value) && value > 0;
             }
             return false;
         }
+
 
         public void PokePossibleExecuteChanged()
         {

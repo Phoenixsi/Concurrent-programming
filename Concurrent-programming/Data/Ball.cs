@@ -40,23 +40,23 @@ namespace Data
             }
         }
 
-        public override float BallPositionX
+        public override double BallPositionX
         {
             get => BallPosition.X;
             set
             {
-                BallPosition = new Vector2(value, BallPosition.Y);
-                OnPropertyChanged("BallPosition.X");
+                BallPosition = new Vector2((float)value, BallPosition.Y);
+                OnPropertyChanged("BallPositionX");
             }
         }
 
-        public override float BallPositionY
+        public override double BallPositionY
         {
             get => BallPosition.Y;
             set
             {
-                BallPosition = new Vector2(BallPosition.X, value);
-                OnPropertyChanged("BallPosition.Y");
+                BallPosition = new Vector2(BallPosition.X,(float) value);
+                OnPropertyChanged("BallPositionY");
             }
         }
 

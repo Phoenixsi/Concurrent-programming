@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Logic;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,11 +17,14 @@ namespace Prezentation
     /// </summary>
     public partial class MainWindow : Window
     {
+        private View view;
         public MainWindow()
         {
             InitializeComponent();
-            View view = new();
+             view = new View();
             DataContext = view;
         }
+
+
     }
 }

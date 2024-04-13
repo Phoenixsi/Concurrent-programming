@@ -6,6 +6,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows;
 
 namespace Prezentation
 {
@@ -13,11 +15,11 @@ namespace Prezentation
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public AbstractBallsCollection? BallsCollection { get; set; }
-        public Start? Start { get; set; }
-        public Stop? Stop { get; set; }
-        public double CanvasWidth { get; set; }
-        public double CanvasHeight { get; set; }
+        public AbstractBallsCollection BallsCollection { get; set; }
+        public Start Start { get; set; }
+        public Stop Stop { get; set; }
+        private double canvasWidth;
+        private double canvasHeight;
 
         public int numberOfBalls;
 
@@ -26,7 +28,8 @@ namespace Prezentation
         public View()
         {
 
-            BallsCollection = new BallsCollection();
+            BallsCollection = new BallsCollection(871, 478.04);
+
             Start = new Start(this);
             Stop = new Stop(this);
 
@@ -55,7 +58,7 @@ namespace Prezentation
             if (Stop.CanExecute(null))
             {
                 Stop.Execute(null);
-                BallsCollection.Dispose();
+                BallsCollection.Clear();
                 BallsCollection.ChangeRadius(double.Parse(Radius));
                 BallsCollection.InitBalls(numberOfBalls);
             }
@@ -78,7 +81,7 @@ namespace Prezentation
             if (Stop.CanExecute(null))
             {
                 Stop.Execute(null);
-                BallsCollection.Dispose();
+                BallsCollection.Clear();
                 BallsCollection.InitBalls(numberOfBalls);
             }
         }
@@ -89,7 +92,7 @@ namespace Prezentation
         }
 
 
-
+        
         internal void OnStartCommand()
         {
             BallsCollection.StartTimer();
@@ -99,5 +102,44 @@ namespace Prezentation
         {
             BallsCollection.StopTimer();
         }
+
+        public double CanvasWidth
+        {
+            get { return canvasWidth; }
+            set
+            {
+                if (canvasWidth != value)
+                {
+                    canvasWidth = value;
+                    OnPropertyChanged("CanvasWidth");
+                }
+            }
+        }
+
+        public double CanvasHeight
+        {
+            get { return canvasHeight; }
+            set
+            {
+                if (canvasHeight != value)
+                {
+                    canvasHeight = value;
+                    OnPropertyChanged("CanvasHeight");
+                }
+            }
+        }
+
+        private void Canvas_Loaded(object sender, RoutedEventArgs e)
+        {
+            Canvas canvas = sender as Canvas;
+            if (canvas != null)
+            {
+                CanvasWidth = canvas.ActualWidth;
+                CanvasHeight = canvas.ActualHeight;
+                BallsCollection = new BallsCollection(CanvasWidth, CanvasHeight);
+            }
+        }
+
+
     }
 }

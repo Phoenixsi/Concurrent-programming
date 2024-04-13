@@ -18,7 +18,7 @@ namespace Data
         public abstract double BallRadius { get; set; }
         public abstract double BallMass { get; set; }
 
-        public abstract float BallPositionX { get; set; }
-        public abstract float BallPositionY { get; set; }
+        public abstract double BallPositionX { get; set; }
+        public abstract double BallPositionY { get; set; }
     }
 }

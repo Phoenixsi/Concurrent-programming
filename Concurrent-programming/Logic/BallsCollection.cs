@@ -1,9 +1,10 @@
 ﻿using Data;
 using System.Collections.ObjectModel;
-using System.Timers;
 using System.Numerics;
-using System;
 using System.Collections.Specialized;
+using System.Timers;
+using Timer = System.Timers.Timer;
+using System.Diagnostics;
 
 namespace Logic
 {
@@ -11,25 +12,26 @@ namespace Logic
     {
         public override ObservableCollection<AbstractBall> Balls { get; set; }
 
-        readonly System.Timers.Timer timer;
-        double CanvaWidth = 500;
-        double CanvaHeight = 500;
+        public readonly Timer timer;
+        double canvasWidth;
+        double canvasHeight;
         double DefRad = 50;
 
-        public BallsCollection(double CanvaWidth = 0.0, double CanvaHeight = 0.0)
+        public BallsCollection(double CanvasWidth = 100.0, double CanvasHeight = 100.0)
         {
-            this.CanvaWidth = CanvaWidth;
-            this.CanvaHeight = CanvaHeight;
-
             Balls = new ObservableCollection<AbstractBall>();
-            timer = new System.Timers.Timer(6.94);
+            this.canvasWidth = CanvasWidth;
+            this.canvasHeight = CanvasHeight;
+
+            timer = new Timer(10);
                 
             timer.Elapsed += EveryFrame;
+            timer.AutoReset = true;
         }
 
         public override int CountedBalls => Balls.Count;
 
-        public void EveryFrame(object? sender, ElapsedEventArgs e)
+        private void EveryFrame(object? sender, ElapsedEventArgs e)
         {
             UpdateFrame();
         }
@@ -38,19 +40,77 @@ namespace Logic
         {
             foreach (Ball ball in Balls)
             {
-                ball.BallPosition += ball.BallVelocity;
+                double newcordX = ball.BallPosition.X + ball.BallVelocity.X;
+                double newcordY = ball.BallPosition.Y + ball.BallVelocity.Y;
+                double newvelX = ball.BallVelocity.X;
+                double newvelY = ball.BallVelocity.Y;
+
+                if (newcordX > canvasHeight - ball.BallRadius)
+                {
+                    newvelX = -newvelX;
+                    newcordX += newvelX;
+                }
+                if (newcordX < 0)
+                {
+                    newvelX = -newvelX;
+                    newcordX += newvelX;
+                }
+                if (newcordY > canvasHeight - ball.BallRadius)
+                {
+                    newcordY = canvasHeight - ball.BallRadius;
+                    newvelY = -newvelY;
+                }
+                if (newcordY < 0)
+                {
+                    newcordY = 0;
+                    newvelY = -newvelY;
+                }
+
+                if (ball.BallPosition.X != newcordX)
+                {
+                    ball.BallPosition = new Vector2((float)newcordX, ball.BallPosition.Y);
+                }
+
+                if (ball.BallPosition.Y != newcordY)
+                {
+                    ball.BallPosition = new Vector2(ball.BallPosition.X, (float)newcordY);
+                }
+
+                if (ball.BallVelocity.X != newvelX)
+                {
+                    ball.BallVelocity = new Vector2((float)newvelX, ball.BallVelocity.Y);
+                }
+
+                if (ball.BallVelocity.Y != newvelY)
+                {
+                    ball.BallVelocity = new Vector2(ball.BallVelocity.X, (float)newvelY);
+                }
+
+                // Log the new position and velocity of the ball
+                Debug.WriteLine($"Ball ID: {ball.BallID}, New Position: {ball.BallPosition}, New Velocity: {ball.BallVelocity}");
             }
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, "UpdateFrame"));
         }
+
+
 
         public override void AddBall()
         {
-            double randomX = DefRad + new Random().NextDouble() * (CanvaWidth - 2 * DefRad);
-            double randomY = DefRad + new Random().NextDouble() * (CanvaHeight - 2 * DefRad);
-            Vector2 randomPosition = new Vector2((float)randomX, (float)randomY);
+            Random random = new Random();
+            Vector2 randomPosition;
+            bool isOverlapping;
 
-            double randomVX = -5 + new Random().NextDouble() * 10;
-            double randomVY = -5 + new Random().NextDouble() * 10;
+            do
+            {
+                double randomX = random.NextDouble() * (canvasWidth - 2 * DefRad);
+                double randomY = random.NextDouble() * (canvasHeight - 2 * DefRad);
+                randomPosition = new Vector2((float)randomX, (float)randomY);
+
+                isOverlapping = Balls.Any(b => Vector2.Distance(b.BallPosition, randomPosition) < 2 * DefRad);
+            }
+            while (isOverlapping);
+
+            double randomVX = -100 + random.NextDouble() * 100;
+            double randomVY = -100 + random.NextDouble() * 100;
             Vector2 randomVelocity = new Vector2((float)randomVX, (float)randomVY);
 
             AbstractBall ball = new Ball(Balls.Count + 1, randomPosition, randomVelocity, DefRad); // Można dodać masę by niektóre były większe 
@@ -58,6 +118,14 @@ namespace Logic
             Balls.Add(ball);
 
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, "AddBall"));
+        }
+
+        public override void InitBalls(int ballsNumber)
+        {
+            for (int i = 0; i < ballsNumber; i++)
+            {
+                AddBall();
+            }
         }
 
         public override void RemoveBall(int index)
@@ -73,27 +141,30 @@ namespace Logic
             }
         }
 
-        public override void InitBalls(int ballsNumber)
+        public override void Clear()
         {
-            for (int i = 0; i < ballsNumber; i++)
+            if (Balls != null)
             {
-                AddBall();
+                Balls.Clear();
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+
             }
+
         }
 
         public override void Dispose()
         {
             Balls.Clear();
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, "Dispose"));
 
             timer?.Stop();
             timer?.Dispose();
+
         }
 
 
         public override void StartTimer()
         {
-            timer.Start();
+            if (timer  != null) timer.Start();
         }
 
         public override void StopTimer()
@@ -104,6 +175,12 @@ namespace Logic
         public override void ChangeRadius(double radius)
         {
             DefRad = radius;
+        }
+
+        public override void ChangeArea(double x, double y)
+        {
+            canvasWidth = x;
+            canvasHeight = y;
         }
 
         public override event NotifyCollectionChangedEventHandler? CollectionChanged;
