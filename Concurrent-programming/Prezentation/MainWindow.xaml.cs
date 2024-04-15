@@ -21,7 +21,7 @@ namespace Prezentation
         public MainWindow()
         {
             InitializeComponent();
-             view = new View();
+            view = new View((new BallsCollection (871.00, 478.00)));
             DataContext = view;
         }
 

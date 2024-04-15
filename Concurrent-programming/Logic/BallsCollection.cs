@@ -39,7 +39,8 @@ namespace Logic
         public void UpdateFrame()
         {
             foreach (Ball ball in Balls)
-            {
+            {   
+
                 double newBallPositionX = ball.BallPositionX + ball.BallVelocity.X;
                 double newBallPositonY = ball.BallPositionY + ball.BallVelocity.Y;
 

@@ -1,13 +1,6 @@
 ﻿using Logic;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows;
 
 namespace Prezentation
 {
@@ -25,10 +18,10 @@ namespace Prezentation
 
         private string radius;
 
-        public View()
+        public View(AbstractBallsCollection ballsCol)
         {
 
-            BallsCollection = new BallsCollection(871.00, 478.00);
+            BallsCollection = ballsCol;
 
             Start = new Start(this);
             Stop = new Stop(this);
@@ -59,7 +52,11 @@ namespace Prezentation
             {
                 Stop.Execute(null);
                 BallsCollection.Clear();
-                BallsCollection.ChangeRadius(double.Parse(Radius));
+                if (Radius != "" && Double.Parse(Radius) < 1000) 
+                {
+                    BallsCollection.ChangeRadius(double.Parse(Radius));
+                }
+
                 BallsCollection.InitBalls(numberOfBalls);
             }
         }
