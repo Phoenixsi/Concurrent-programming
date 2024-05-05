@@ -1,32 +1,40 @@
-﻿using Data;
+﻿// BallsCollection.cs
+using Data;
+using System;
 using System.Collections.ObjectModel;
-using System.Numerics;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 using System.Timers;
 using Timer = System.Timers.Timer;
-using System.Diagnostics;
 
 namespace Logic
 {
+    /// <summary>
+    /// Concrete implementation of AbstractBallsCollection.
+    /// </summary>
     public class BallsCollection : AbstractBallsCollection
     {
         public override ObservableCollection<AbstractBall> Balls { get; set; }
 
-        public readonly Timer timer;
-        double canvasWidth;
-        double canvasHeight;
-        double DefRad = 50;
+        private readonly Timer timer;
+        private readonly object lockObject = new object();
+        private double canvasWidth;
+        private double canvasHeight;
+        private double defRad = 50.0;
 
-        public BallsCollection(double CanvasWidth = 100.0, double CanvasHeight = 100.0)
+        public BallsCollection(double canvasWidth = 100.0, double canvasHeight = 100.0)
         {
             Balls = new ObservableCollection<AbstractBall>();
-            this.canvasWidth = CanvasWidth;
-            this.canvasHeight = CanvasHeight;
+            this.canvasWidth = canvasWidth;
+            this.canvasHeight = canvasHeight;
 
-            timer = new Timer(20);
-                
+            timer = new Timer(20)
+            {
+                AutoReset = true
+            };
             timer.Elapsed += EveryFrame;
-            timer.AutoReset = true;
         }
 
         public override int CountedBalls => Balls.Count;
@@ -36,73 +44,57 @@ namespace Logic
             UpdateFrame();
         }
 
+        /// <summary>
+        /// Updates the positions and velocities of all balls in the collection.
+        /// </summary>
         public void UpdateFrame()
         {
-            foreach (Ball ball in Balls)
-            {   
-
-                double newBallPositionX = ball.BallPositionX + ball.BallVelocity.X;
-                double newBallPositonY = ball.BallPositionY + ball.BallVelocity.Y;
-
-                double newBallVelocityX = ball.BallVelocity.X;
-                double newBallVelocityY = ball.BallVelocity.Y;
-
-                // Góra
-                if (newBallPositionX < 0)
+            lock (lockObject)
+            {
+                foreach (Ball ball in Balls)
                 {
-                    newBallVelocityX = -newBallVelocityX;
-                    newBallPositionX += newBallVelocityX;
-                }
+                    double newBallPositionX = ball.BallPositionX + ball.BallVelocity.X;
+                    double newBallPositionY = ball.BallPositionY + ball.BallVelocity.Y;
 
-                //Lewa
-                if (newBallPositonY < 0)
-                {
-                    newBallPositonY = 0;
-                    newBallVelocityY = -newBallVelocityY;
-                }
+                    double newBallVelocityX = ball.BallVelocity.X;
+                    double newBallVelocityY = ball.BallVelocity.Y;
 
-                //Praa
-                if (newBallPositionX > canvasWidth - ball.BallRadius)
-                {
-                    newBallPositionX = canvasWidth - ball.BallRadius;
-                    newBallVelocityX = -newBallVelocityX;
-                }
+                    // Collision with the left or right wall
+                    if (newBallPositionX < 0)
+                    {
+                        newBallVelocityX = -newBallVelocityX;
+                        newBallPositionX = 0;
+                    }
+                    else if (newBallPositionX > canvasWidth - ball.BallRadius)
+                    {
+                        newBallVelocityX = -newBallVelocityX;
+                        newBallPositionX = canvasWidth - ball.BallRadius;
+                    }
 
-                //Dół
-                if (newBallPositonY > canvasHeight - ball.BallRadius )
-                {
-                    newBallPositonY = canvasHeight - ball.BallRadius;
-                    newBallVelocityY = -newBallVelocityY;
-                }
+                    // Collision with the top or bottom wall
+                    if (newBallPositionY < 0)
+                    {
+                        newBallVelocityY = -newBallVelocityY;
+                        newBallPositionY = 0;
+                    }
+                    else if (newBallPositionY > canvasHeight - ball.BallRadius)
+                    {
+                        newBallVelocityY = -newBallVelocityY;
+                        newBallPositionY = canvasHeight - ball.BallRadius;
+                    }
 
-
-                if (ball.BallPositionX != newBallPositionX)
-                {
+                    // Update ball position
                     ball.BallPositionX = newBallPositionX;
-                }
+                    ball.BallPositionY = newBallPositionY;
 
-                if (ball.BallPositionY != newBallPositonY)
-                {
-                    ball.BallPositionY = newBallPositonY;
-                }
+                    // Update ball velocity
+                    ball.BallVelocity = new Vector2((float)newBallVelocityX, (float)newBallVelocityY);
 
-                if (ball.BallVelocity.X != newBallVelocityX)
-                {
-                    ball.BallVelocity = new Vector2((float)newBallVelocityX, ball.BallVelocity.Y);
+                    // Log the new position and velocity of the ball
+                    Debug.WriteLine($"Ball ID: {ball.BallID}, New Position: {ball.BallPosition}, New Velocity: {ball.BallVelocity}");
                 }
-
-                if (ball.BallVelocity.Y != newBallVelocityY)
-                {
-                    ball.BallVelocity = new Vector2(ball.BallVelocity.X, (float)newBallVelocityY);
-                }
-
-                // Log the new position and velocity of the ball
-                Debug.WriteLine($"Ball ID: {ball.BallID}, New Position: {ball.BallPosition}, New Velocity: {ball.BallVelocity}");
             }
         }
-
-
-
 
         public override void AddBall()
         {
@@ -112,23 +104,21 @@ namespace Logic
 
             do
             {
-                double randomX = random.NextDouble() * (canvasWidth - 2 * DefRad);
-                double randomY = random.NextDouble() * (canvasHeight - 2 * DefRad);
+                double randomX = random.NextDouble() * (canvasWidth - 2 * defRad);
+                double randomY = random.NextDouble() * (canvasHeight - 2 * defRad);
                 randomPosition = new Vector2((float)randomX, (float)randomY);
 
-                isOverlapping = Balls.Any(b => Vector2.Distance(b.BallPosition, randomPosition) < 2 * DefRad);
-            }
-            while (isOverlapping);
+                isOverlapping = Balls.Any(b => Vector2.Distance(b.BallPosition, randomPosition) < 2 * defRad);
+            } while (isOverlapping);
 
-            double randomVX = -10 + random.NextDouble() * 10;
-            double randomVY = -10 + random.NextDouble() * 10;
+            double randomVX = -10 + random.NextDouble() * 20; // Adjusted to ensure speed in both directions
+            double randomVY = -10 + random.NextDouble() * 20;
             Vector2 randomVelocity = new Vector2((float)randomVX, (float)randomVY);
 
-            AbstractBall ball = new Ball(Balls.Count + 1, randomPosition, randomVelocity, DefRad); // Można dodać masę by niektóre były większe 
+            AbstractBall ball = new Ball(Balls.Count + 1, randomPosition, randomVelocity, defRad);
 
             Balls.Add(ball);
-
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, "AddBall"));
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, ball));
         }
 
         public override void InitBalls(int ballsNumber)
@@ -141,14 +131,15 @@ namespace Logic
 
         public override void RemoveBall(int index)
         {
-            if (index <= Balls.Count)
+            if (index < Balls.Count)
             {
+                AbstractBall ball = Balls[index];
                 Balls.RemoveAt(index);
-                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, "RemoveBall"));
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, ball));
             }
             else
             {
-                throw new ArgumentOutOfRangeException("Usunięcie poza zasięgiem");
+                throw new ArgumentOutOfRangeException("Remove index out of range.");
             }
         }
 
@@ -158,24 +149,19 @@ namespace Logic
             {
                 Balls.Clear();
                 CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-
             }
-
         }
 
         public override void Dispose()
         {
             Balls.Clear();
-
             timer?.Stop();
             timer?.Dispose();
-
         }
-
 
         public override void StartTimer()
         {
-            if (timer  != null) timer.Start();
+            timer?.Start();
         }
 
         public override void StopTimer()
@@ -185,7 +171,7 @@ namespace Logic
 
         public override void ChangeRadius(double radius)
         {
-            DefRad = radius;
+            defRad = radius;
         }
 
         public override void ChangeArea(double x, double y)
@@ -195,6 +181,5 @@ namespace Logic
         }
 
         public override event NotifyCollectionChangedEventHandler? CollectionChanged;
-
     }
 }
