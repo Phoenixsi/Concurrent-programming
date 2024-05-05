@@ -1,13 +1,13 @@
-﻿// AbstractBall.cs
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Data
 {
-    /// <summary>
-    /// Abstract base class representing a ball.
-    /// </summary>
     public abstract class AbstractBall : INotifyPropertyChanged
     {
         public abstract event PropertyChangedEventHandler? PropertyChanged;
@@ -20,10 +20,5 @@ namespace Data
 
         public abstract double BallPositionX { get; set; }
         public abstract double BallPositionY { get; set; }
-
-       /* protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }*/
     }
 }

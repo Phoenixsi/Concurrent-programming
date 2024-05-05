@@ -102,20 +102,24 @@ namespace Logic
             Vector2 randomPosition;
             bool isOverlapping;
 
+            // Generate a random radius between 10 and 50
+            double randomRadius = 10 + random.NextDouble() * 40;
+            double randomMass = randomRadius; // Use radius as a proxy for mass
+
             do
             {
-                double randomX = random.NextDouble() * (canvasWidth - 2 * defRad);
-                double randomY = random.NextDouble() * (canvasHeight - 2 * defRad);
+                double randomX = random.NextDouble() * (canvasWidth - 2 * randomRadius);
+                double randomY = random.NextDouble() * (canvasHeight - 2 * randomRadius);
                 randomPosition = new Vector2((float)randomX, (float)randomY);
 
-                isOverlapping = Balls.Any(b => Vector2.Distance(b.BallPosition, randomPosition) < 2 * defRad);
+                isOverlapping = Balls.Any(b => Vector2.Distance(b.BallPosition, randomPosition) < 2 * randomRadius);
             } while (isOverlapping);
 
-            double randomVX = -10 + random.NextDouble() * 20; // Adjusted to ensure speed in both directions
+            double randomVX = -10 + random.NextDouble() * 20; // Ensure speed in both directions
             double randomVY = -10 + random.NextDouble() * 20;
             Vector2 randomVelocity = new Vector2((float)randomVX, (float)randomVY);
 
-            AbstractBall ball = new Ball(Balls.Count + 1, randomPosition, randomVelocity, defRad);
+            AbstractBall ball = new Ball(Balls.Count + 1, randomPosition, randomVelocity, randomRadius, randomMass);
 
             Balls.Add(ball);
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, ball));
