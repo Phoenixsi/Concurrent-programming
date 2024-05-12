@@ -34,6 +34,7 @@ namespace Logic
             {
                 AutoReset = true
             };
+
             timer.Elapsed += EveryFrame;
         }
 
@@ -50,50 +51,89 @@ namespace Logic
         public void UpdateFrame()
         {
             lock (lockObject)
+{
+    foreach (Ball ball in Balls)
+    {
+        double newBallPositionX = ball.BallPositionX + ball.BallVelocity.X;
+        double newBallPositionY = ball.BallPositionY + ball.BallVelocity.Y;
+
+        double newBallVelocityX = ball.BallVelocity.X;
+        double newBallVelocityY = ball.BallVelocity.Y;
+
+        // Collision with the left or right wall
+        if (newBallPositionX < 0)
+        {
+            newBallVelocityX = -newBallVelocityX;
+            newBallPositionX = 0;
+        }
+        else if (newBallPositionX > canvasWidth - ball.BallRadius)
+        {
+            newBallVelocityX = -newBallVelocityX;
+            newBallPositionX = canvasWidth - ball.BallRadius;
+        }
+
+        // Collision with the top or bottom wall
+        if (newBallPositionY < 0)
+        {
+            newBallVelocityY = -newBallVelocityY;
+            newBallPositionY = 0;
+        }
+        else if (newBallPositionY > canvasHeight - ball.BallRadius)
+        {
+            newBallVelocityY = -newBallVelocityY;
+            newBallPositionY = canvasHeight - ball.BallRadius;
+        }
+
+        // Update ball position
+        ball.BallPositionX = newBallPositionX;
+        ball.BallPositionY = newBallPositionY;
+
+        // Update ball velocity
+        ball.BallVelocity = new Vector2((float)newBallVelocityX, (float)newBallVelocityY);
+
+        // Handle ball-ball collisions
+        for (int i = 0; i < Balls.Count; i++)
+        {
+            for (int j = i + 1; j < Balls.Count; j++)
             {
-                foreach (Ball ball in Balls)
+                Ball ball1 = (Ball)Balls[i];
+                Ball ball2 = (Ball)Balls[j];
+                Vector2 distanceVector = ball1.BallPosition - ball2.BallPosition;
+                float distance = distanceVector.Length();
+                float sumRadius = (float)(ball1.BallRadius + ball2.BallRadius);
+
+                if (distance < sumRadius)
                 {
-                    double newBallPositionX = ball.BallPositionX + ball.BallVelocity.X;
-                    double newBallPositionY = ball.BallPositionY + ball.BallVelocity.Y;
+                    Vector2 normal = Vector2.Normalize(distanceVector);
+                    Vector2 relativeVelocity = ball1.BallVelocity - ball2.BallVelocity;
+                    float velocityAlongNormal = Vector2.Dot(relativeVelocity, normal);
 
-                    double newBallVelocityX = ball.BallVelocity.X;
-                    double newBallVelocityY = ball.BallVelocity.Y;
+                    if (velocityAlongNormal > 0) continue;
 
-                    // Collision with the left or right wall
-                    if (newBallPositionX < 0)
-                    {
-                        newBallVelocityX = -newBallVelocityX;
-                        newBallPositionX = 0;
-                    }
-                    else if (newBallPositionX > canvasWidth - ball.BallRadius)
-                    {
-                        newBallVelocityX = -newBallVelocityX;
-                        newBallPositionX = canvasWidth - ball.BallRadius;
-                    }
+                    float restitution = 1.0f; // Perfectly elastic collision
+                    float impulseMagnitude = (float)(-(1 + restitution) * velocityAlongNormal / (1 / ball1.BallMass + 1 / ball2.BallMass));
 
-                    // Collision with the top or bottom wall
-                    if (newBallPositionY < 0)
-                    {
-                        newBallVelocityY = -newBallVelocityY;
-                        newBallPositionY = 0;
-                    }
-                    else if (newBallPositionY > canvasHeight - ball.BallRadius)
-                    {
-                        newBallVelocityY = -newBallVelocityY;
-                        newBallPositionY = canvasHeight - ball.BallRadius;
-                    }
+                    Vector2 impulse = impulseMagnitude * normal;
+                    Vector2 newVelocity1 = ball1.BallVelocity + impulse / (float)ball1.BallMass;
+                    Vector2 newVelocity2 = ball2.BallVelocity - impulse / (float)ball2.BallMass;
 
-                    // Update ball position
-                    ball.BallPositionX = newBallPositionX;
-                    ball.BallPositionY = newBallPositionY;
+                    ball1.BallVelocity = newVelocity1;
+                    ball2.BallVelocity = newVelocity2;
 
-                    // Update ball velocity
-                    ball.BallVelocity = new Vector2((float)newBallVelocityX, (float)newBallVelocityY);
-
-                    // Log the new position and velocity of the ball
-                    Debug.WriteLine($"Ball ID: {ball.BallID}, New Position: {ball.BallPosition}, New Velocity: {ball.BallVelocity}");
+                    // Prevent overlap jitter
+                    float overlap = sumRadius - distance;
+                    Vector2 correction = normal * overlap / 2.0f;
+                    ball1.BallPosition += correction;
+                    ball2.BallPosition -= correction;
                 }
             }
+        }
+
+        // Log the new position and velocity of the ball
+        Debug.WriteLine($"Ball ID: {ball.BallID}, New Position: {ball.BallPosition}, New Velocity: {ball.BallVelocity}");
+    }
+}
+
         }
 
         public override void AddBall()
