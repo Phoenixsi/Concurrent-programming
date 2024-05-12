@@ -24,7 +24,7 @@ namespace Logic
             this.canvasHeight = CanvasHeight;
 
             timer = new Timer(20);
-                
+
             timer.Elapsed += EveryFrame;
             timer.AutoReset = true;
         }
@@ -38,66 +38,82 @@ namespace Logic
 
         public void UpdateFrame()
         {
+            // Update positions based on velocities
             foreach (Ball ball in Balls)
-            {   
+            {
+                ball.BallPositionX += ball.BallVelocity.X;
+                ball.BallPositionY += ball.BallVelocity.Y;
+            }
 
-                double newBallPositionX = ball.BallPositionX + ball.BallVelocity.X;
-                double newBallPositonY = ball.BallPositionY + ball.BallVelocity.Y;
-
-                double newBallVelocityX = ball.BallVelocity.X;
-                double newBallVelocityY = ball.BallVelocity.Y;
-
-                // Góra
-                if (newBallPositionX < 0)
+            // Handle ball-wall collisions and correct positions
+            foreach (Ball ball in Balls)
+            {
+                if (ball.BallPositionX <= ball.BallRadius)
                 {
-                    newBallVelocityX = -newBallVelocityX;
-                    newBallPositionX += newBallVelocityX;
+                    Vector2 newVelocity = ball.BallVelocity;
+                    newVelocity.X = -ball.BallVelocity.X;
+                    ball.BallVelocity = newVelocity;
+                    ball.BallPositionX = ball.BallRadius; // Correct position
                 }
-
-                //Lewa
-                if (newBallPositonY < 0)
+                if (ball.BallPositionX >= canvasWidth - ball.BallRadius)
                 {
-                    newBallPositonY = 0;
-                    newBallVelocityY = -newBallVelocityY;
+                    Vector2 newVelocity = ball.BallVelocity;
+                    newVelocity.X = -ball.BallVelocity.X;
+                    ball.BallVelocity = newVelocity;
+                    ball.BallPositionX = canvasWidth - ball.BallRadius; // Correct position
                 }
-
-                //Praa
-                if (newBallPositionX > canvasWidth - ball.BallRadius)
+                if (ball.BallPositionY <= ball.BallRadius)
                 {
-                    newBallPositionX = canvasWidth - ball.BallRadius;
-                    newBallVelocityX = -newBallVelocityX;
+                    Vector2 newVelocity = ball.BallVelocity;
+                    newVelocity.Y = -ball.BallVelocity.Y;
+                    ball.BallVelocity = newVelocity;
+                    ball.BallPositionY = ball.BallRadius; // Correct position
                 }
-
-                //Dół
-                if (newBallPositonY > canvasHeight - ball.BallRadius )
+                if (ball.BallPositionY >= canvasHeight - ball.BallRadius)
                 {
-                    newBallPositonY = canvasHeight - ball.BallRadius;
-                    newBallVelocityY = -newBallVelocityY;
+                    Vector2 newVelocity = ball.BallVelocity;
+                    newVelocity.Y = -ball.BallVelocity.Y;
+                    ball.BallVelocity = newVelocity;
+                    ball.BallPositionY = canvasHeight - ball.BallRadius; // Correct position
                 }
+            }
 
-
-                if (ball.BallPositionX != newBallPositionX)
+            // Handle ball-ball collisions
+            for (int i = 0; i < Balls.Count; i++)
+            {
+                for (int j = i + 1; j < Balls.Count; j++)
                 {
-                    ball.BallPositionX = newBallPositionX;
-                }
+                    Ball ball1 = (Ball)Balls[i];
+                    Ball ball2 = (Ball)Balls[j];
+                    Vector2 distanceVector = ball1.BallPosition - ball2.BallPosition;
+                    float distance = distanceVector.Length();
+                    float sumRadius = (float)(ball1.BallRadius + ball2.BallRadius);
 
-                if (ball.BallPositionY != newBallPositonY)
-                {
-                    ball.BallPositionY = newBallPositonY;
-                }
+                    if (distance < sumRadius)
+                    {
+                        Vector2 normal = Vector2.Normalize(distanceVector);
+                        Vector2 relativeVelocity = ball1.BallVelocity - ball2.BallVelocity;
+                        float velocityAlongNormal = Vector2.Dot(relativeVelocity, normal);
 
-                if (ball.BallVelocity.X != newBallVelocityX)
-                {
-                    ball.BallVelocity = new Vector2((float)newBallVelocityX, ball.BallVelocity.Y);
-                }
+                        if (velocityAlongNormal > 0) continue;
 
-                if (ball.BallVelocity.Y != newBallVelocityY)
-                {
-                    ball.BallVelocity = new Vector2(ball.BallVelocity.X, (float)newBallVelocityY);
-                }
+                        float restitution = 1.0f; // Perfectly elastic collision
+                        float impulseMagnitude = (float)(-(1 + restitution) * velocityAlongNormal / (1 / ball1.BallMass + 1 / ball2.BallMass));
 
-                // Log the new position and velocity of the ball
-                Debug.WriteLine($"Ball ID: {ball.BallID}, New Position: {ball.BallPosition}, New Velocity: {ball.BallVelocity}");
+                        Vector2 impulse = impulseMagnitude * normal;
+                        Vector2 newVelocity1 = ball1.BallVelocity + impulse / (float)ball1.BallMass;
+                        Vector2 newVelocity2 = ball2.BallVelocity - impulse / (float)ball2.BallMass;
+
+                        ball1.BallVelocity = newVelocity1;
+                        ball2.BallVelocity = newVelocity2;
+
+                        // Prevent overlap jitter
+                        float overlap = sumRadius - distance;
+                        Vector2 correction = normal * overlap / 2.0f;
+                        ball1.BallPosition += correction;
+                        ball2.BallPosition -= correction;
+                    }
+                }
             }
         }
 
@@ -175,7 +191,7 @@ namespace Logic
 
         public override void StartTimer()
         {
-            if (timer  != null) timer.Start();
+            if (timer != null) timer.Start();
         }
 
         public override void StopTimer()
