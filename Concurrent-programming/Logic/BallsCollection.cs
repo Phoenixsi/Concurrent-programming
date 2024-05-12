@@ -1,32 +1,41 @@
-﻿using Data;
+﻿// BallsCollection.cs
+using Data;
+using System;
 using System.Collections.ObjectModel;
-using System.Numerics;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 using System.Timers;
 using Timer = System.Timers.Timer;
-using System.Diagnostics;
 
 namespace Logic
 {
+    /// <summary>
+    /// Concrete implementation of AbstractBallsCollection.
+    /// </summary>
     public class BallsCollection : AbstractBallsCollection
     {
         public override ObservableCollection<AbstractBall> Balls { get; set; }
 
-        public readonly Timer timer;
-        double canvasWidth;
-        double canvasHeight;
-        double DefRad = 50;
+        private readonly Timer timer;
+        private readonly object lockObject = new object();
+        private double canvasWidth;
+        private double canvasHeight;
+        private double defRad = 50.0;
 
-        public BallsCollection(double CanvasWidth = 100.0, double CanvasHeight = 100.0)
+        public BallsCollection(double canvasWidth = 100.0, double canvasHeight = 100.0)
         {
             Balls = new ObservableCollection<AbstractBall>();
-            this.canvasWidth = CanvasWidth;
-            this.canvasHeight = CanvasHeight;
+            this.canvasWidth = canvasWidth;
+            this.canvasHeight = canvasHeight;
 
-            timer = new Timer(20);
+            timer = new Timer(20)
+            {
+                AutoReset = true
+            };
 
             timer.Elapsed += EveryFrame;
-            timer.AutoReset = true;
         }
 
         public override int CountedBalls => Balls.Count;
@@ -36,89 +45,96 @@ namespace Logic
             UpdateFrame();
         }
 
+        /// <summary>
+        /// Updates the positions and velocities of all balls in the collection.
+        /// </summary>
         public void UpdateFrame()
         {
-            // Update positions based on velocities
-            foreach (Ball ball in Balls)
+            lock (lockObject)
+{
+    foreach (Ball ball in Balls)
+    {
+        double newBallPositionX = ball.BallPositionX + ball.BallVelocity.X;
+        double newBallPositionY = ball.BallPositionY + ball.BallVelocity.Y;
+
+        double newBallVelocityX = ball.BallVelocity.X;
+        double newBallVelocityY = ball.BallVelocity.Y;
+
+        // Collision with the left or right wall
+        if (newBallPositionX < 0)
+        {
+            newBallVelocityX = -newBallVelocityX;
+            newBallPositionX = 0;
+        }
+        else if (newBallPositionX > canvasWidth - ball.BallRadius)
+        {
+            newBallVelocityX = -newBallVelocityX;
+            newBallPositionX = canvasWidth - ball.BallRadius;
+        }
+
+        // Collision with the top or bottom wall
+        if (newBallPositionY < 0)
+        {
+            newBallVelocityY = -newBallVelocityY;
+            newBallPositionY = 0;
+        }
+        else if (newBallPositionY > canvasHeight - ball.BallRadius)
+        {
+            newBallVelocityY = -newBallVelocityY;
+            newBallPositionY = canvasHeight - ball.BallRadius;
+        }
+
+        // Update ball position
+        ball.BallPositionX = newBallPositionX;
+        ball.BallPositionY = newBallPositionY;
+
+        // Update ball velocity
+        ball.BallVelocity = new Vector2((float)newBallVelocityX, (float)newBallVelocityY);
+
+        // Handle ball-ball collisions
+        for (int i = 0; i < Balls.Count; i++)
+        {
+            for (int j = i + 1; j < Balls.Count; j++)
             {
-                ball.BallPositionX += ball.BallVelocity.X;
-                ball.BallPositionY += ball.BallVelocity.Y;
-            }
+                Ball ball1 = (Ball)Balls[i];
+                Ball ball2 = (Ball)Balls[j];
+                Vector2 distanceVector = ball1.BallPosition - ball2.BallPosition;
+                float distance = distanceVector.Length();
+                float sumRadius = (float)(ball1.BallRadius + ball2.BallRadius);
 
-            // Handle ball-wall collisions and correct positions
-            foreach (Ball ball in Balls)
-            {
-                if (ball.BallPositionX <= ball.BallRadius)
+                if (distance < sumRadius)
                 {
-                    Vector2 newVelocity = ball.BallVelocity;
-                    newVelocity.X = -ball.BallVelocity.X;
-                    ball.BallVelocity = newVelocity;
-                    ball.BallPositionX = ball.BallRadius; // Correct position
-                }
-                if (ball.BallPositionX >= canvasWidth - ball.BallRadius)
-                {
-                    Vector2 newVelocity = ball.BallVelocity;
-                    newVelocity.X = -ball.BallVelocity.X;
-                    ball.BallVelocity = newVelocity;
-                    ball.BallPositionX = canvasWidth - ball.BallRadius; // Correct position
-                }
-                if (ball.BallPositionY <= ball.BallRadius)
-                {
-                    Vector2 newVelocity = ball.BallVelocity;
-                    newVelocity.Y = -ball.BallVelocity.Y;
-                    ball.BallVelocity = newVelocity;
-                    ball.BallPositionY = ball.BallRadius; // Correct position
-                }
-                if (ball.BallPositionY >= canvasHeight - ball.BallRadius)
-                {
-                    Vector2 newVelocity = ball.BallVelocity;
-                    newVelocity.Y = -ball.BallVelocity.Y;
-                    ball.BallVelocity = newVelocity;
-                    ball.BallPositionY = canvasHeight - ball.BallRadius; // Correct position
-                }
-            }
+                    Vector2 normal = Vector2.Normalize(distanceVector);
+                    Vector2 relativeVelocity = ball1.BallVelocity - ball2.BallVelocity;
+                    float velocityAlongNormal = Vector2.Dot(relativeVelocity, normal);
 
-            // Handle ball-ball collisions
-            for (int i = 0; i < Balls.Count; i++)
-            {
-                for (int j = i + 1; j < Balls.Count; j++)
-                {
-                    Ball ball1 = (Ball)Balls[i];
-                    Ball ball2 = (Ball)Balls[j];
-                    Vector2 distanceVector = ball1.BallPosition - ball2.BallPosition;
-                    float distance = distanceVector.Length();
-                    float sumRadius = (float)(ball1.BallRadius + ball2.BallRadius);
+                    if (velocityAlongNormal > 0) continue;
 
-                    if (distance < sumRadius)
-                    {
-                        Vector2 normal = Vector2.Normalize(distanceVector);
-                        Vector2 relativeVelocity = ball1.BallVelocity - ball2.BallVelocity;
-                        float velocityAlongNormal = Vector2.Dot(relativeVelocity, normal);
+                    float restitution = 1.0f; // Perfectly elastic collision
+                    float impulseMagnitude = (float)(-(1 + restitution) * velocityAlongNormal / (1 / ball1.BallMass + 1 / ball2.BallMass));
 
-                        if (velocityAlongNormal > 0) continue;
+                    Vector2 impulse = impulseMagnitude * normal;
+                    Vector2 newVelocity1 = ball1.BallVelocity + impulse / (float)ball1.BallMass;
+                    Vector2 newVelocity2 = ball2.BallVelocity - impulse / (float)ball2.BallMass;
 
-                        float restitution = 1.0f; // Perfectly elastic collision
-                        float impulseMagnitude = (float)(-(1 + restitution) * velocityAlongNormal / (1 / ball1.BallMass + 1 / ball2.BallMass));
+                    ball1.BallVelocity = newVelocity1;
+                    ball2.BallVelocity = newVelocity2;
 
-                        Vector2 impulse = impulseMagnitude * normal;
-                        Vector2 newVelocity1 = ball1.BallVelocity + impulse / (float)ball1.BallMass;
-                        Vector2 newVelocity2 = ball2.BallVelocity - impulse / (float)ball2.BallMass;
-
-                        ball1.BallVelocity = newVelocity1;
-                        ball2.BallVelocity = newVelocity2;
-
-                        // Prevent overlap jitter
-                        float overlap = sumRadius - distance;
-                        Vector2 correction = normal * overlap / 2.0f;
-                        ball1.BallPosition += correction;
-                        ball2.BallPosition -= correction;
-                    }
+                    // Prevent overlap jitter
+                    float overlap = sumRadius - distance;
+                    Vector2 correction = normal * overlap / 2.0f;
+                    ball1.BallPosition += correction;
+                    ball2.BallPosition -= correction;
                 }
             }
         }
 
+        // Log the new position and velocity of the ball
+        Debug.WriteLine($"Ball ID: {ball.BallID}, New Position: {ball.BallPosition}, New Velocity: {ball.BallVelocity}");
+    }
+}
 
-
+        }
 
         public override void AddBall()
         {
@@ -126,25 +142,27 @@ namespace Logic
             Vector2 randomPosition;
             bool isOverlapping;
 
+            // Generate a random radius between 10 and 50
+            double randomRadius = 10 + random.NextDouble() * 40;
+            double randomMass = randomRadius; // Use radius as a proxy for mass
+
             do
             {
-                double randomX = random.NextDouble() * (canvasWidth - 2 * DefRad);
-                double randomY = random.NextDouble() * (canvasHeight - 2 * DefRad);
+                double randomX = random.NextDouble() * (canvasWidth - 2 * randomRadius);
+                double randomY = random.NextDouble() * (canvasHeight - 2 * randomRadius);
                 randomPosition = new Vector2((float)randomX, (float)randomY);
 
-                isOverlapping = Balls.Any(b => Vector2.Distance(b.BallPosition, randomPosition) < 2 * DefRad);
-            }
-            while (isOverlapping);
+                isOverlapping = Balls.Any(b => Vector2.Distance(b.BallPosition, randomPosition) < 2 * randomRadius);
+            } while (isOverlapping);
 
-            double randomVX = -10 + random.NextDouble() * 10;
-            double randomVY = -10 + random.NextDouble() * 10;
+            double randomVX = -10 + random.NextDouble() * 20; // Ensure speed in both directions
+            double randomVY = -10 + random.NextDouble() * 20;
             Vector2 randomVelocity = new Vector2((float)randomVX, (float)randomVY);
 
-            AbstractBall ball = new Ball(Balls.Count + 1, randomPosition, randomVelocity, DefRad); // Można dodać masę by niektóre były większe 
+            AbstractBall ball = new Ball(Balls.Count + 1, randomPosition, randomVelocity, randomRadius, randomMass);
 
             Balls.Add(ball);
-
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, "AddBall"));
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, ball));
         }
 
         public override void InitBalls(int ballsNumber)
@@ -157,14 +175,15 @@ namespace Logic
 
         public override void RemoveBall(int index)
         {
-            if (index <= Balls.Count)
+            if (index < Balls.Count)
             {
+                AbstractBall ball = Balls[index];
                 Balls.RemoveAt(index);
-                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, "RemoveBall"));
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, ball));
             }
             else
             {
-                throw new ArgumentOutOfRangeException("Usunięcie poza zasięgiem");
+                throw new ArgumentOutOfRangeException("Remove index out of range.");
             }
         }
 
@@ -174,24 +193,19 @@ namespace Logic
             {
                 Balls.Clear();
                 CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-
             }
-
         }
 
         public override void Dispose()
         {
             Balls.Clear();
-
             timer?.Stop();
             timer?.Dispose();
-
         }
-
 
         public override void StartTimer()
         {
-            if (timer != null) timer.Start();
+            timer?.Start();
         }
 
         public override void StopTimer()
@@ -201,7 +215,7 @@ namespace Logic
 
         public override void ChangeRadius(double radius)
         {
-            DefRad = radius;
+            defRad = radius;
         }
 
         public override void ChangeArea(double x, double y)
@@ -211,6 +225,5 @@ namespace Logic
         }
 
         public override event NotifyCollectionChangedEventHandler? CollectionChanged;
-
     }
 }

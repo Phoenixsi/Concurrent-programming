@@ -54,7 +54,7 @@ namespace Data
             get => BallPosition.Y;
             set
             {
-                BallPosition = new Vector2(BallPosition.X,(float) value);
+                BallPosition = new Vector2(BallPosition.X, (float)value);
                 OnPropertyChanged("BallPositionY");
             }
         }

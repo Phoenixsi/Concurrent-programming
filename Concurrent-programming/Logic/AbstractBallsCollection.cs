@@ -26,6 +26,6 @@ namespace Logic
 
         public abstract event NotifyCollectionChangedEventHandler? CollectionChanged;
 
-       
+
     }
 }
