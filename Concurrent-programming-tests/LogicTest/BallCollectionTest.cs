@@ -1,5 +1,6 @@
 ﻿using Data;
 using Logic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -16,104 +17,69 @@ namespace LogicTest
         public void InitBallsTest()
         {
             AbstractBallsCollection ballsCollection = new BallsCollection(500, 800);
-            List<string> eventName = new List<string>();
-
             int initialBalls = 20;
-
             ballsCollection.InitBalls(initialBalls);
-
-            Assert.IsTrue(ballsCollection.CountedBalls.Equals(initialBalls));
+            Assert.AreEqual(initialBalls, ballsCollection.CountedBalls);
         }
-
 
         [TestMethod]
         public void AddBallsTest()
         {
             AbstractBallsCollection ballsCollection = new BallsCollection(500, 800);
-
             ballsCollection.AddBall();
-            Assert.IsTrue(ballsCollection.CountedBalls.Equals(1));
-
+            Assert.AreEqual(1, ballsCollection.CountedBalls);
             ballsCollection.AddBall();
-            Assert.IsTrue(ballsCollection.CountedBalls.Equals(2));
-
+            Assert.AreEqual(2, ballsCollection.CountedBalls);
         }
 
         [TestMethod]
-        public void RemoveBallsTest() 
+        public void RemoveBallsTest()
         {
             AbstractBallsCollection ballsCollection = new BallsCollection(500, 800);
-
             ballsCollection.AddBall();
             ballsCollection.AddBall();
-
             ballsCollection.RemoveBall(1);
-            Assert.IsTrue(ballsCollection.CountedBalls.Equals(1));
+            Assert.AreEqual(1, ballsCollection.CountedBalls);
             ballsCollection.RemoveBall(0);
-            Assert.IsTrue(ballsCollection.CountedBalls.Equals(0));
+            Assert.AreEqual(0, ballsCollection.CountedBalls);
         }
 
         [TestMethod]
-        public void ClearBallsTest() 
+        public void ClearBallsTest()
         {
             AbstractBallsCollection ballsCollection = new BallsCollection(500, 800);
-
             ballsCollection.AddBall();
             ballsCollection.AddBall();
-
             ballsCollection.Dispose();
-
-            Assert.IsTrue(ballsCollection.CountedBalls.Equals(0));
+            Assert.AreEqual(0, ballsCollection.CountedBalls);
         }
-
-/*        [TestMethod]
-        public async Task PostionAfterFrameUpdate()
-        {
-            AbstractBallsCollection ballsCollection = new BallsCollection(500, 800);
-            ballsCollection.AddBall();
-
-            AbstractBall ballBefor = ballsCollection.Balls[0];
-
-            ballsCollection.StartTimer();
-            await Task.Delay(20);
-            ballsCollection.StopTimer();
-
-            Assert.AreNotEqual(ballBefor.BallPosition, ballsCollection.Balls[0].BallPosition);
-            Assert.AreNotEqual(ballBefor.BallVelocity, ballsCollection.Balls[0].BallVelocity);
-        }
-*/
 
         [TestMethod]
-        public void CollectionChange()
+        public async Task PositionAfterFrameUpdateTest()
         {
             AbstractBallsCollection ballsCollection = new BallsCollection(500, 800);
-
-            List<string> eventName = new List<string>();
-
-            ballsCollection.CollectionChanged += (sender, change) => {
-                eventName.Add(change.ToString());
-            };
-
             ballsCollection.AddBall();
-            ballsCollection.AddBall();
-            Assert.IsTrue(eventName.Count == 2);
-
-            ballsCollection.RemoveBall(0);
-            Assert.IsTrue(eventName.Count == 3);
-
-            
-            ballsCollection.Clear();
-            Assert.IsTrue(eventName.Count == 4);
-
-/*
+            var ballBefore = ballsCollection.Balls[0];
             ballsCollection.StartTimer();
-            await Task.Delay(10);
+            await Task.Delay(40);  // Wait two frame intervals to ensure the timer has elapsed at least once
             ballsCollection.StopTimer();
-*/
-
-
-
+            Assert.AreNotEqual(ballBefore.BallPosition, ballsCollection.Balls[0].BallPosition);
+            Assert.AreNotEqual(ballBefore.BallVelocity, ballsCollection.Balls[0].BallVelocity);
         }
 
+        [TestMethod]
+        public void CollectionChangeEventTest()
+        {
+            AbstractBallsCollection ballsCollection = new BallsCollection(500, 800);
+            List<string> eventNames = new List<string>();
+            ballsCollection.CollectionChanged += (sender, e) => eventNames.Add(e.Action.ToString());
+            ballsCollection.AddBall();
+            ballsCollection.AddBall();
+            Assert.AreEqual(2, eventNames.Count);  // Check if two Add actions were recorded
+            ballsCollection.RemoveBall(0);
+            Assert.AreEqual(3, eventNames.Count);  // Check if a Remove action was recorded
+            ballsCollection.Clear();
+            Assert.AreEqual(4, eventNames.Count);  // Check if a Reset action was recorded
+        }
     }
 }

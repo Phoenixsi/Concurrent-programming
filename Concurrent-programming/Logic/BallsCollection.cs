@@ -48,12 +48,12 @@ namespace Logic
             // Handle ball-wall collisions and correct positions
             foreach (Ball ball in Balls)
             {
-                if (ball.BallPositionX <= ball.BallRadius)
+                if (ball.BallPositionX <= 0)
                 {
                     Vector2 newVelocity = ball.BallVelocity;
                     newVelocity.X = -ball.BallVelocity.X;
                     ball.BallVelocity = newVelocity;
-                    ball.BallPositionX = ball.BallRadius; // Correct position
+                    ball.BallPositionX = 0; // Correct position
                 }
                 if (ball.BallPositionX >= canvasWidth - ball.BallRadius)
                 {
@@ -62,12 +62,12 @@ namespace Logic
                     ball.BallVelocity = newVelocity;
                     ball.BallPositionX = canvasWidth - ball.BallRadius; // Correct position
                 }
-                if (ball.BallPositionY <= ball.BallRadius)
+                if (ball.BallPositionY <= 0)
                 {
                     Vector2 newVelocity = ball.BallVelocity;
                     newVelocity.Y = -ball.BallVelocity.Y;
                     ball.BallVelocity = newVelocity;
-                    ball.BallPositionY = ball.BallRadius; // Correct position
+                    ball.BallPositionY = 0; // Correct position
                 }
                 if (ball.BallPositionY >= canvasHeight - ball.BallRadius)
                 {
@@ -78,16 +78,20 @@ namespace Logic
                 }
             }
 
-            // Handle ball-ball collisions
+            //Handle ball-ball collisions
             for (int i = 0; i < Balls.Count; i++)
             {
                 for (int j = i + 1; j < Balls.Count; j++)
                 {
                     Ball ball1 = (Ball)Balls[i];
                     Ball ball2 = (Ball)Balls[j];
-                    Vector2 distanceVector = ball1.BallPosition - ball2.BallPosition;
+
+                    var ball1Pos = ball1.BallPosition + new Vector2((float)ball1.BallRadius / 2);
+                    var ball2Pos = ball2.BallPosition + new Vector2((float)ball2.BallRadius / 2);
+
+                    Vector2 distanceVector = ball1Pos - ball2Pos;
                     float distance = distanceVector.Length();
-                    float sumRadius = (float)(ball1.BallRadius + ball2.BallRadius);
+                    float sumRadius = (float)(ball1.BallRadius/2 + ball2.BallRadius/2);
 
                     if (distance < sumRadius)
                     {
