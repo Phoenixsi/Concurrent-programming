@@ -74,18 +74,18 @@ namespace BallTests
                     eventNames.Add(change.PropertyName);
             };
 
-            Vector2 newPosition = new Vector2(10, 5);
             Vector2 newVelocity = new Vector2(50, 12);
             
             Assert.IsNotNull(Ball);
-            Ball.BallPosition = newPosition;
-            Assert.AreEqual(Ball.BallPosition, newPosition);
+            Ball.BallPositionX = 10;
+            Assert.AreEqual(Ball.BallPositionX, 10);
             Assert.IsTrue(eventNames.Count == 1);
-            Assert.IsTrue(eventNames[0] == "BallPosition");
+            Ball.BallPositionY = 5;
+            Assert.AreEqual(Ball.BallPositionY, 5);
+            Assert.IsTrue(eventNames.Count == 2);
             Ball.BallVelocity = newVelocity;
             Assert.AreEqual(Ball.BallVelocity, newVelocity);
-            Assert.IsTrue(eventNames.Count == 2);
-            Assert.IsTrue(eventNames[1] == "BallVelocity");
+            Assert.IsTrue(eventNames.Count == 3);
 
 
 

@@ -33,10 +33,10 @@ namespace Logic
 
         private async void EveryFrame(object? sender, ElapsedEventArgs e)
         {
-            UpdateFrame();
+            await UpdateFrame();
         }
 
-        public async Task UpdateFrame()
+        public Task UpdateFrame()
         {
             // Update positions based on velocities
             foreach (Ball ball in Balls)
@@ -119,10 +119,9 @@ namespace Logic
                     }
                 }
             }
+
+            return Task.CompletedTask;
         }
-
-
-
 
         public override void AddBall()
         {
