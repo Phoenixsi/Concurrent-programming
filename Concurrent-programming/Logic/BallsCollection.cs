@@ -31,12 +31,12 @@ namespace Logic
 
         public override int CountedBalls => Balls.Count;
 
-        private void EveryFrame(object? sender, ElapsedEventArgs e)
+        private async void EveryFrame(object? sender, ElapsedEventArgs e)
         {
             UpdateFrame();
         }
 
-        public void UpdateFrame()
+        public async Task UpdateFrame()
         {
             // Update positions based on velocities
             foreach (Ball ball in Balls)
